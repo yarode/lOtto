@@ -1,16 +1,13 @@
-pragma solidity ^0.8.1;
+pragma solidity >=0.6.0 <0.8.0;
 
-import "hardhat/console.sol";
-import "./Ownable.sol";
-import "./SafeMath.sol";
+//import "./Ownable.sol";
+//import "./SafeMath.sol";
 
 contract Otto {
 
-  using SafeMath for uint;
+  //using SafeMath for uint;
 
   constructor() {
-    address winningAddress;
-    address[] participants;
   }
 
   struct Entry {
@@ -21,34 +18,37 @@ contract Otto {
   mapping (address => Entry) entryByParticipant;
   mapping (address => uint) currentShareSize;
 
-  function getShareSize(Entry tempEntry) private returns(uint) {
-    return ((now() - prevEntry.startDate) * prevEntry.amount + currentShareSize[msg.sender]);
+  address[] participants;
+  address winningAddress;
+
+  function getShareSize(Entry memory tempEntry) private view returns(uint) {
+    return ((block.timestamp - tempEntry.startDate) * tempEntry.amount + currentShareSize[msg.sender]);
   }
 
   // function to become payable and take actual funds to stake
   function enter(uint amount) external {
     Entry memory newEntry;
-    uint newShareShize = 1;
+    uint newShareSize;
     // if user is depositing on top of an already existing entry
-    if(currentShareSize[msg.sender]) {
-      Entry prevEntry = entryByParticipant[msg.sender];
-      newShareSize = (now() - prevEntry.startDate) * prevEntry.amount + currentShareSize[msg.sender];
+    if(currentShareSize[msg.sender] != 0) {
+      Entry memory prevEntry = entryByParticipant[msg.sender];
+      newShareSize = (block.timestamp - prevEntry.startDate) * prevEntry.amount + currentShareSize[msg.sender];
       newEntry.amount = amount + prevEntry.amount;
       // staking logic here
     // if user has no share size yet
     } else {
       newEntry.amount = amount;
-      currentShareSize[msg.sender] = newShareSize;
-      participants.push[msg.sender];
+      currentShareSize[msg.sender] = 1;
+      participants.push(msg.sender);
       // staking logic here
     }
-    newEntry.startDate = now();
+    newEntry.startDate = block.timestamp;
     entryByParticipant[msg.sender] = newEntry;
   }
 
-  // function to become payable and retrieve funds
+  /* function to become payable and retrieve funds
   function exit(uint amount) external {
-    
+
   }
 
   function deposit(uint amount) private payable {
@@ -62,14 +62,15 @@ contract Otto {
   function drawWinner() external onlyOwner {
 
   }
+  */
 
   // return proportional size multiplied by 10^5
   function getRelativeShareSize() public view returns(uint) {
     uint totalShareSize;
     for(uint i = 0; i < participants.length; i++) {
-      totalShareSize = totalShareSize.add(getShareSize(entryByParticipant[participants[i]]));
+      totalShareSize += getShareSize(entryByParticipant[participants[i]]);
     }
-    return (getShareSize(entryByParticipant[participants[msg.sender]]) / totalShareSize * 10**5);
+    return (getShareSize(entryByParticipant[msg.sender]) / totalShareSize * 10**5);
   }
 
 }
