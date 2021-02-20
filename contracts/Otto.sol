@@ -1,11 +1,11 @@
 pragma solidity >=0.6.0 <0.8.0;
 
 //import "./Ownable.sol";
-//import "./SafeMath.sol";
+import "./SafeMath.sol";
 
 contract Otto {
 
-  //using SafeMath for uint;
+  using SafeMath for uint256;
 
   constructor() {
   }
@@ -64,13 +64,21 @@ contract Otto {
   }
   */
 
+  function getStakedAmount() public view returns(uint) {
+    return entryByParticipant[msg.sender].amount;
+  }
+
+  function getStartDate() public view returns(uint) {
+    return entryByParticipant[msg.sender].startDate;
+  }
+
   // return proportional size multiplied by 10^5
   function getRelativeShareSize() public view returns(uint) {
     uint totalShareSize;
     for(uint i = 0; i < participants.length; i++) {
-      totalShareSize += getShareSize(entryByParticipant[participants[i]]);
+      totalShareSize = totalShareSize.add(getShareSize(entryByParticipant[participants[i]]));
     }
-    return (getShareSize(entryByParticipant[msg.sender]) / totalShareSize * 10**5);
+    return ((10**5 * getShareSize(entryByParticipant[msg.sender])).div(totalShareSize));
   }
 
 }
