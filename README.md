@@ -8,3 +8,8 @@ No loss lotteries:
 Pooltogether:
 - https://docs.pooltogether.com/
 - https://app.pooltogether.com/
+
+Notes:
+- https://hackmd.io/39TD5NJrTxyk5KRraOIMsg
+
+Keeping example files like 'Greeter.sol' and the sample tests/scripts for my own reference points.
